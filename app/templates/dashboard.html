@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | WildcatsClassified{% endblock %}
+{% block content %}
+<section class="vault-panel panel">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Your Vault Access!</p>
+      <h2>Unlock WildcatsClassified Encryption!</h2>
+    </div>
+  </div>
+  <form id="vault-unlock-form" class="vault-form">
+    <label>Vault Passphrase!
+      <input type="password" id="vault-passphrase" placeholder="Use your vault or your login passphrase">
+    </label>
+    <div class="hero-actions">
+      <button class="btn btn-primary" type="submit">Unlock Here!</button>
+      <button class="btn btn-secondary" id="clear-vault-passphrase" type="button">Clear!</button>
+    </div>
+  </form>
+  <p class="tiny-note" id="vault-status">Your passphrase is kept ONLY in this browser tab using the session storage (you're welcome!).</p>
+</section>
+
+<section class="dashboard-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Create a new note! </p>
+        <h2>New Classified Note!</h2>
+      </div>
+    </div>
+    <form method="post" action="{{ url_for('main.create_note') }}" class="form-grid" id="note-form">
+      <label>Title
+        <input type="text" name="title" required>
+      </label>
+      <label>Note Body
+        <textarea id="note-body" rows="8" placeholder="Write your note here..."></textarea>
+      </label>
+      <input type="hidden" name="encrypted_content" id="encrypted-content">
+      <input type="hidden" name="salt" id="salt-field">
+      <input type="hidden" name="nonce" id="nonce-field">
+      <button class="btn btn-primary" type="submit">Encrypt and save!</button>
+      <p class="tiny-note">Btw...your notes are encrypted in the browser using AES-GCM before they get stored!</p>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <p class="eyebrow">Your Notes</p>
+        <h2>Saved Things</h2>
+      </div>
+    </div>
+
+    {% if notes %}
+      <div class="notes-list">
+        {% for note in notes %}
+          <article class="note-card">
+            <div class="note-top">
+              <div>
+                <h3>{{ note.title }}</h3>
+                <p class="meta">Updated {{ note.updated_at.strftime('%b %d, %Y %I:%M %p') }}</p>
+              </div>
+              <form method="post" action="{{ url_for('main.delete_note', note_id=note.id) }}">
+                <button class="btn btn-danger" type="submit">Delete (bye note) </button>
+              </form>
+            </div>
+            <div class="cipher-box" data-ciphertext="{{ note.encrypted_content }}" data-salt="{{ note.salt }}" data-nonce="{{ note.nonce }}">Encrypted note stored. Click decrypt to view it in this browser.</div>
+            <div class="note-actions-row">
+              <button class="btn btn-secondary decrypt-note-btn" type="button">Decrypt Note!</button>
+            </div>
+            <textarea class="decrypted-output" rows="6" hidden readonly></textarea>
+
+            <div class="attachments-block">
+              <h4>Attachments</h4>
+              {% if note.attachments %}
+                <ul class="attachment-list">
+                  {% for attachment in note.attachments %}
+                    <li>
+                      <span>{{ attachment.original_filename }}</span>
+                      <span class="meta">({{ attachment.file_size }} bytes encrypted)</span>
+                      <button class="btn btn-secondary download-attachment-btn" type="button" data-meta-url="{{ url_for('main.attachment_meta', attachment_id=attachment.id) }}">Decrypt download</button>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="meta">No attachments yet...</p>
+              {% endif %}
+
+              <form method="post" action="{{ url_for('main.upload_attachment', note_id=note.id) }}" enctype="multipart/form-data" class="attachment-form">
+                <input type="file" name="attachment" required>
+                <button class="btn btn-secondary" type="submit">~Encrypt & Upload~</button>
+              </form>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-state">No notes yet..Create your first one on the left!</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

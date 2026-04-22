@@ -1,0 +1,5 @@
+What I used for the front end! If your laptop is alittle slow after running this....this is why! I used Flask for the backend and SQLite for the database, and this is how I make it work
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Werkzeug==3.0.3
