@@ -1,5 +1,8 @@
-#What I used for the front end! If your laptop is alittle slow after running this....this is why! I used Flask for the backend and SQLite for the database, and this is how I make it work
+# Incase you want to install What I used for the front end! If your laptop is alittle slow after running this....this is why! I used Flask for the backend and SQLite for the database, and this is how I make it work
 Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
 Werkzeug==3.0.3
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
