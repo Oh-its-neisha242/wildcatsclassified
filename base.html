@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}WildcatsClassified{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="/app/static/css/styles.css">
 </head>
 <body>
   <header class="site-header">
   <div class="container nav">
     <a class="brand brand-with-logo" href="{{ url_for('auth.landing') }}">
-      <img src="{{ url_for('static', filename='images/Wildcats_Classified.png') }}" alt="WildcatsClassified Logo" class="logo">
+      <img src="/app/static/images/Wildcats_Classified.png" alt="WildcatsClassified Logo" class="logo">
       <span class="brand-name">WildcatsClassified</span>
     </a>
 
@@ -42,7 +42,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="/app/static/js/dashboard.js"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
