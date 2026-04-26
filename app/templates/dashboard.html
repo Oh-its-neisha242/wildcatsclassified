@@ -10,6 +10,8 @@
   </div>
 </div>
 
+<div id="notes"></div>
+
   <div class="hero-card">
     <p class="eyebrow">Hail Thee Maroon &amp; Gold! Welcome to WildcatsClassified!</p>
     <h1>Encrypt your Wildcats notes in this browser.</h1>
@@ -149,3 +151,26 @@
 
 </section>
 {% endblock %}
+
+<script>
+async function loadNotes() {
+  const response = await fetch("https://wildcatsclassified-production.up.railway.app/listings");
+  const notes = await response.json();
+
+  const container = document.getElementById("notes");
+  container.innerHTML = "";
+
+  notes.forEach(note => {
+    const card = document.createElement("div");
+    card.innerHTML = `
+      <h3>${note.title}</h3>
+      <p><strong>Encrypted content:</strong> ${note.encrypted_content}</p>
+      <small>Created: ${note.created_at}</small>
+      <hr>
+    `;
+    container.appendChild(card);
+  });
+}
+
+loadNotes();
+</script>
