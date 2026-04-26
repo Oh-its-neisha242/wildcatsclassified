@@ -1,54 +1,71 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard | WildcatsClassified{% endblock %}
+
 {% block content %}
-<section class="vault-panel panel">
-  <div class="panel-header">
-    <div>
-      <p class="eyebrow">Your Vault Access!</p>
-      <h2>Unlock WildcatsClassified Encryption!</h2>
-    </div>
+<section class="dashboard-layout" aria-label="WildcatsClassified encrypted notes dashboard">
+  <div id="encrypt-loader" class="encrypt-loader" style="display: none;">
+  <div class="loader-card">
+    <div class="spinner"></div>
+    <p id="loader-text">Encrypting...</p>
   </div>
-  <form id="vault-unlock-form" class="vault-form">
-    <label>Vault Passphrase!
-      <input type="password" id="vault-passphrase" placeholder="Use your vault or your login passphrase">
-    </label>
-    <div class="hero-actions">
-      <button class="btn btn-primary" type="submit">Unlock Here!</button>
-      <button class="btn btn-secondary" id="clear-vault-passphrase" type="button">Clear!</button>
-    </div>
-  </form>
-  <p class="tiny-note" id="vault-status">Your passphrase is kept ONLY in this browser tab using the session storage (you're welcome!).</p>
-</section>
+</div>
 
-<section class="dashboard-grid">
-  <div class="panel">
-    <div class="panel-header">
-      <div>
-        <p class="eyebrow">Create a new note! </p>
-        <h2>New Classified Note!</h2>
-      </div>
-    </div>
-    <form method="post" action="{{ url_for('main.create_note') }}" class="form-grid" id="note-form">
-      <label>Title
-        <input type="text" name="title" required>
-      </label>
-      <label>Note Body
+  <div class="hero-card">
+    <p class="eyebrow">Hail Thee Maroon &amp; Gold! Welcome to WildcatsClassified!</p>
+    <h1>Encrypt your Wildcats notes in this browser.</h1>
+    <p class="hero-copy">
+      Hey Wildcat!Set your vault passphrase, create your encrypted notes, and upload encrypted attachments.
+      WildcatsClassified stores only ciphertext, so your data is safe here!
+    </p>
+
+    <section class="vault-panel">
+      <h2>Unlock Your Vault</h2>
+
+      <form class="vault-form" id="vault-unlock-form">
+        <label for="vault-passphrase">Vault passphrase</label>
+        <input id="vault-passphrase" type="password" placeholder="Enter your vault passphrase">
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" type="submit">Unlock in this tab</button>
+          <button class="btn btn-secondary" id="clear-vault-passphrase" type="button">Clear</button>
+        </div>
+
+        <p class="tiny-note" id="vault-status">
+          Your passphrase stays in this browser tab for local encryption and decryption.
+        </p>
+      </form>
+    </section>
+
+    <section class="create-note-panel">
+      <h2>Create Encrypted Note!</h2>
+
+      <form method="post" action="{{ url_for('main.create_note') }}" class="form-grid" id="note-form">
+        <label for="title">Note title</label>
+        <input id="title" type="text" name="title" placeholder="Example: Why is purple the best color?" required>
+
+        <label for="note-body">Note body</label>
         <textarea id="note-body" rows="8" placeholder="Write your note here..."></textarea>
-      </label>
-      <input type="hidden" name="encrypted_content" id="encrypted-content">
-      <input type="hidden" name="salt" id="salt-field">
-      <input type="hidden" name="nonce" id="nonce-field">
-      <button class="btn btn-primary" type="submit">Encrypt and save!</button>
-      <p class="tiny-note">Btw...your notes are encrypted in the browser using AES-GCM before they get stored!</p>
-    </form>
+
+        <input type="hidden" name="encrypted_content" id="encrypted-content">
+        <input type="hidden" name="salt" id="salt-field">
+        <input type="hidden" name="nonce" id="nonce-field">
+
+        <button class="btn btn-primary" type="submit">Encrypt and Save</button>
+
+        <p class="tiny-note">
+          Your note content is encrypted in the browser before being stored in the database.
+        </p>
+      </form>
+    </section>
   </div>
 
   <div class="panel">
     <div class="panel-header">
-      <div>
-        <p class="eyebrow">Your Notes</p>
-        <h2>Saved Things</h2>
-      </div>
+      <p class="eyebrow">Your Notes</p>
+      <h2>Saved Encrypted Items</h2>
+      <p class="tiny-note">
+        Notes and attachments shown here are stored as encrypted data until you decrypt them locally.
+      </p>
     </div>
 
     {% if notes %}
@@ -58,27 +75,49 @@
             <div class="note-top">
               <div>
                 <h3>{{ note.title }}</h3>
-                <p class="meta">Updated {{ note.updated_at.strftime('%b %d, %Y %I:%M %p') }}</p>
+                <p class="meta">
+                  Updated {{ note.updated_at.strftime('%b %d, %Y %I:%M %p') }}
+                </p>
               </div>
-              <form method="post" action="{{ url_for('main.delete_note', note_id=note.id) }}">
-                <button class="btn btn-danger" type="submit">Delete (bye note) </button>
+
+              <form method="post" action="{{ url_for('main.delete_note', note_id=note.id) }}"
+                    onsubmit="return confirm('Delete this encrypted note and its attachments?');">
+                <button class="btn btn-danger" type="submit">Delete</button>
               </form>
             </div>
-            <div class="cipher-box" data-ciphertext="{{ note.encrypted_content }}" data-salt="{{ note.salt }}" data-nonce="{{ note.nonce }}">Encrypted note stored. Click decrypt to view it in this browser.</div>
-            <div class="note-actions-row">
-              <button class="btn btn-secondary decrypt-note-btn" type="button">Decrypt Note!</button>
+
+            <div class="cipher-box"
+                 data-ciphertext="{{ note.encrypted_content }}"
+                 data-salt="{{ note.salt }}"
+                 data-nonce="{{ note.nonce }}">
+              🔐 Encrypted note stored. Click decrypt to view it in this browser!
             </div>
+
+            <div class="note-actions-row">
+              <button class="btn btn-secondary decrypt-note-btn" type="button">
+                Decrypt Note
+              </button>
+            </div>
+
             <textarea class="decrypted-output" rows="6" hidden readonly></textarea>
 
             <div class="attachments-block">
               <h4>Attachments</h4>
+
               {% if note.attachments %}
                 <ul class="attachment-list">
                   {% for attachment in note.attachments %}
                     <li>
-                      <span>{{ attachment.original_filename }}</span>
-                      <span class="meta">({{ attachment.file_size }} bytes encrypted)</span>
-                      <button class="btn btn-secondary download-attachment-btn" type="button" data-meta-url="{{ url_for('main.attachment_meta', attachment_id=attachment.id) }}">Decrypt download</button>
+                      <div>
+                        <strong>{{ attachment.original_filename }}</strong>
+                        <span class="meta">({{ attachment.file_size }} bytes encrypted)</span>
+                      </div>
+
+                      <button class="btn btn-secondary download-attachment-btn"
+                              type="button"
+                              data-meta-url="{{ url_for('main.attachment_meta', attachment_id=attachment.id) }}">
+                        Decrypt Your Download
+                      </button>
                     </li>
                   {% endfor %}
                 </ul>
@@ -86,17 +125,27 @@
                 <p class="meta">No attachments yet...</p>
               {% endif %}
 
-              <form method="post" action="{{ url_for('main.upload_attachment', note_id=note.id) }}" enctype="multipart/form-data" class="attachment-form">
+              <form method="post"
+                    action="{{ url_for('main.upload_attachment', note_id=note.id) }}"
+                    enctype="multipart/form-data"
+                    class="attachment-form">
+                <label>Upload encrypted attachment</label>
                 <input type="file" name="attachment" required>
-                <button class="btn btn-secondary" type="submit">~Encrypt & Upload~</button>
+                <button class="btn btn-secondary" type="submit">
+                  Encrypt &amp; Upload
+                </button>
               </form>
             </div>
           </article>
         {% endfor %}
       </div>
     {% else %}
-      <p class="empty-state">No notes yet..Create your first one on the left!</p>
+      <div class="empty-state">
+        <h3>No notes yet.</h3>
+        <p>Create your first encrypted note using the form on the left!</p>
+      </div>
     {% endif %}
   </div>
+
 </section>
 {% endblock %}

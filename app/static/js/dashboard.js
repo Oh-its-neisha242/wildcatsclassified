@@ -3,6 +3,28 @@ const AES_KEY_LENGTH = 256;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
+function showEncryptLoader(message = "Encrypting...") {
+  const loader = document.getElementById("encrypt-loader");
+  const loaderText = document.getElementById("loader-text");
+
+  if (loaderText) {
+    loaderText.textContent = message;
+  }
+
+  if (loader) {
+    loader.style.display = "flex";
+  }
+}
+
+function hideEncryptLoader() {
+  const loader = document.getElementById("encrypt-loader");
+
+  if (loader) {
+    loader.style.display = "none";
+  }
+}
+
+
 function bytesToBase64(bytes) {
   let binary = "";
   const chunkSize = 0x8000;
@@ -182,6 +204,7 @@ function wireNoteCreation() {
         throw new Error("Please enter note content.");
       }
 
+      showEncryptLoader("Encrypting your note...");
       const encrypted = await encryptText(noteBody.value, passphrase);
       encryptedField.value = encrypted.encrypted;
       saltField.value = encrypted.salt;
@@ -189,6 +212,7 @@ function wireNoteCreation() {
       noteBody.value = "";
       form.submit();
     } catch (error) {
+      hideEncryptLoader();
       alert(error.message || "Unable to encrypt note.");
     }
   });
@@ -225,9 +249,10 @@ function wireAttachmentUploads() {
         const fileInput = form.querySelector('input[type="file"]');
         const file = fileInput.files[0];
         if (!file) {
+          hideEncryptLoader();
           throw new Error("Choose a file first.");
         }
-
+        showEncryptLoader("Encrypting your attachment...");
         const encrypted = await encryptArrayBuffer(await file.arrayBuffer(), passphrase);
         const uploadBlob = new Blob([encrypted.encryptedBytes], { type: "application/octet-stream" });
         const formData = new FormData();
@@ -243,11 +268,13 @@ function wireAttachmentUploads() {
         });
 
         if (!response.ok) {
+          hideEncryptLoader();
           throw new Error("Attachment upload failed...");
         }
 
         window.location.reload();
       } catch (error) {
+        hideEncryptLoader();
         alert(error.message || "Unable to encrypt and upload your file.");
       }
     });
@@ -293,6 +320,7 @@ function wireAttachmentDownloads() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  hideEncryptLoader();
   wireVaultControls();
   wireNoteCreation();
   wireNoteDecryption();
