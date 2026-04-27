@@ -11,6 +11,10 @@ from .models import Attachment, Note
 
 main_bp = Blueprint("main", __name__)
 
+@main_bp.route("/")
+def landing():
+    return render_template("landing.html")
+
 
 @main_bp.route("/dashboard")
 @login_required

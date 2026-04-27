@@ -2,7 +2,22 @@
 {% block title %}Dashboard | WildcatsClassified{% endblock %}
 
 {% block content %}
-<section class="dashboard-layout" aria-label="WildcatsClassified encrypted notes dashboard">
+<section class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>WildcatsClassified</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+    <a href="{{ url_for('main.dashboard') }}">🏠 Dashboard</a>
+    <a href="#vault">🔐 Vault</a>
+    <a href="#create-note">📝 New Note</a>
+    <a href="#saved-notes">📁 Notes</a>
+    <a href="{{ url_for('auth.logout') }}">🚪 Logout</a>
+</nav>
+  </aside>
+
+  <main class="dashboard-main">
   <div id="encrypt-loader" class="encrypt-loader" style="display: none;">
   <div class="loader-card">
     <div class="spinner"></div>
@@ -18,7 +33,7 @@
       WildcatsClassified stores only ciphertext, so your data is safe here!
     </p>
 
-    <section class="vault-panel">
+<section class="vault-panel" id="vault">
       <h2>Unlock Your Vault</h2>
 
       <form class="vault-form" id="vault-unlock-form">
@@ -26,7 +41,7 @@
         <input id="vault-passphrase" type="password" placeholder="Enter your vault passphrase">
 
         <div class="hero-actions">
-          <button class="btn btn-primary" type="submit">Unlock in this tab</button>
+          <button class="btn btn-primary" type="submit">🔑 Unlock in this tab</button>
           <button class="btn btn-secondary" id="clear-vault-passphrase" type="button">Clear</button>
         </div>
 
@@ -36,8 +51,8 @@
       </form>
     </section>
 
-    <section class="create-note-panel">
-      <h2>Create Encrypted Note!</h2>
+    <section class="create-note-panel" id="create-note">
+      <h2>📝 Create Encrypted Note!</h2>
 
       <form method="post" action="{{ url_for('main.create_note') }}" class="form-grid" id="note-form">
         <label for="title">Note title</label>
@@ -59,7 +74,7 @@
     </section>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="saved-notes">
     <div class="panel-header">
       <p class="eyebrow">Your Notes</p>
       <h2>Saved Encrypted Items</h2>
@@ -102,7 +117,7 @@
             <textarea class="decrypted-output" rows="6" hidden readonly></textarea>
 
             <div class="attachments-block">
-              <h4>Attachments</h4>
+              <h4>📁Attachments</h4>
 
               {% if note.attachments %}
                 <ul class="attachment-list">
@@ -147,5 +162,6 @@
     {% endif %}
   </div>
 
+  </main>
 </section>
 {% endblock %}

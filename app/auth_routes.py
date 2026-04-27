@@ -9,8 +9,6 @@ auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/")
 def landing():
-    if current_user.is_authenticated:
-        return redirect(url_for("main.dashboard"))
     return render_template("landing.html")
 
 
