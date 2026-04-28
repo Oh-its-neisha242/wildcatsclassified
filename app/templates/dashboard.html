@@ -95,8 +95,7 @@
                 </p>
               </div>
 
-              <form method="post" action="{{ url_for('main.delete_note', note_id=note.id) }}"
-                    onsubmit="return confirm('Delete this encrypted note and its attachments?');">
+              <form method="post" action="{{ url_for('main.delete_note', note_id=note.id) }}" class="delete-note-form">
                 <button class="btn btn-danger" type="submit">Delete</button>
               </form>
             </div>

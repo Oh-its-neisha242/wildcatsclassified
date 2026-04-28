@@ -218,6 +218,28 @@ function wireNoteCreation() {
   });
 }
 
+function wireNoteDeletion() {
+  document.querySelectorAll(".delete-note-form").forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      try {
+        requireVaultPassphrase();
+
+        const confirmDelete = confirm(
+          "Delete this encrypted note and its attachments?"
+        );
+
+        if (confirmDelete) {
+          form.submit();
+        }
+      } catch (error) {
+        alert("Please unlock your vault before deleting any notes.");
+      }
+    });
+  });
+}
+
 function wireNoteDecryption() {
   document.querySelectorAll(".decrypt-note-btn").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -275,7 +297,7 @@ function wireAttachmentUploads() {
         window.location.reload();
       } catch (error) {
         hideEncryptLoader();
-        alert(error.message || "Unable to encrypt and upload your file.");
+        alert(error.message || "Unable to encrypt and upload your file. Please try again.");
       }
     });
   });
@@ -300,13 +322,13 @@ function wireAttachmentDownloads() {
         const metaUrl = button.dataset.metaUrl;
         const metaResponse = await fetch(metaUrl, { credentials: "same-origin" });
         if (!metaResponse.ok) {
-          throw new Error("Unable to load attachment metadata.");
+          throw new Error("Unable to load the attachment metadata.");
         }
         const meta = await metaResponse.json();
 
         const fileResponse = await fetch(meta.download_url, { credentials: "same-origin" });
         if (!fileResponse.ok) {
-          throw new Error("Unable to download encrypted attachment.");
+          throw new Error("Unable to download the encrypted attachment.");
         }
 
         const encryptedBuffer = await fileResponse.arrayBuffer();
@@ -323,6 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
   hideEncryptLoader();
   wireVaultControls();
   wireNoteCreation();
+  wireNoteDeletion();
   wireNoteDecryption();
   wireAttachmentUploads();
   wireAttachmentDownloads();
